@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Order Dashboard</title>
+  <link rel="stylesheet" href="/admin/css/dashboard.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="dashboard-container">
+    <div class="dashboard-header">
+      <h1>Order Dashboard</h1>
+    </div>
+
+    <div id="stats-container" class="stats-container"></div>
+
+    <!-- Moved here -->
+    <div class="header-actions">
+      <div class="filter-group">
+        <label for="filter-select">Filter:</label>
+        <select id="filter-select">
+          <option value="all">All Orders</option>
+          <option value="pending">Pending</option>
+          <option value="completed">Completed</option>
+        </select>
+      </div>
+      <div class="sort-group">
+        <label for="sort-select">Sort By:</label>
+        <select id="sort-select">
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="price-high">Price (High-Low)</option>
+          <option value="price-low">Price (Low-High)</option>
+        </select>
+      </div>
+      <button class="refresh-btn" id="refresh-btn">Refresh</button>
+    </div>
+
+    <div class="loading-spinner" id="loading-spinner">
+      <div class="spinner"></div>
+      <span>Loading orders...</span>
+    </div>
+
+    <div id="orders-container" class="order-container"></div>
+  </div>
+
+  <script src="/admin/js/dashboard.js"></script>
+</body>
+</html>

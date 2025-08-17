@@ -1,0 +1,63 @@
+[
+  {
+    "id": "home",
+    "items": [
+      {
+        "name": "come",
+        "price": 5,
+        "image": "/images/salmon-salad.jpg",
+        "description": "sadfsd"
+      },
+      {
+        "name": "dome",
+        "price": 50,
+        "image": "/images/salmon-salad3.jpg",
+        "description": "sadfsdgfhjfg"
+      }
+    ]
+  },
+  {
+    "id": "promo",
+    "items": [
+      {
+        "name": "Salmon Salad",
+        "price": 7,
+        "image": "/images/salmon-salad.jpg",
+        "description": "Fresh salmon with crisp veggies."
+      }
+    ]
+  },
+  {
+    "id": "value-pack",
+    "items": [
+      {
+        "name": "Chicken Teriyaki",
+        "price": 90,
+        "image": "/images/chicken-teriyaki.jpg",
+        "description": "Delicious grilled chicken with teriyaki sauce."
+      }
+    ]
+  },
+  {
+    "id": "yummy",
+    "items": [
+      {
+        "name": "Salmon Salad",
+        "price": 7,
+        "image": "/images/salmon-salad.jpg",
+        "description": "Fresh salmon with crisp veggies."
+      }
+    ]
+  },
+  {
+    "id": "special",
+    "items": [
+      {
+        "name": "Salmo Salad",
+        "price": 10,
+        "image": "/images/salmon-salad.jpg",
+        "description": "Fresh salmon with crisp veggies."
+      }
+    ]
+  }
+]

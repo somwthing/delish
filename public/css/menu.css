@@ -1,0 +1,192 @@
+.menu-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(15px, 3vw, 20px);
+  padding: clamp(10px, 2vw, 15px);
+}
+
+.menu-card {
+  background: var(--card-bg);
+  border-radius: clamp(12px, 2vw, 16px);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.card-content {
+  padding: clamp(6px, 1.5vw, 8px);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+}
+
+.card-header {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: clamp(4px, 1vw, 6px);
+}
+
+.image-container {
+  width: 100%;
+  height: clamp(120px, 20vw, 150px);
+  border-radius: clamp(6px, 1.5vw, 8px);
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.3s ease;
+}
+
+.image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.image-container:hover {
+  transform: scale(1.02);
+}
+
+.card-footer {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 2vw, 10px);
+  padding: clamp(4px, 1vw, 6px);
+}
+
+.title-price-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: clamp(4px, 1vw, 6px);
+}
+
+.title-price-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: clamp(8px, 2vw, 10px);
+  width: 100%;
+}
+
+.card-title {
+  font-size: clamp(1.1rem, 2.5vw, 1.2rem);
+  font-weight: 600;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.price-tag {
+  font-size: clamp(1.1rem, 2.5vw, 1.2rem);
+  font-weight: 500;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.card-description {
+  text-align: left;
+  margin: 0;
+  color: #888;
+  font-size: clamp(0.9rem, 2.2vw, 1rem);
+}
+
+.quantity-control {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  gap: clamp(8px, 2vw, 10px);
+}
+
+.quantity-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: clamp(4px, 1vw, 6px);
+}
+
+.quantity-buttons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: clamp(4px, 1vw, 6px);
+}
+
+.card-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.quantity-control label {
+  font-weight: 500;
+  color: var(--dark);
+  font-size: clamp(0.7rem, 2vw, 0.8rem);
+}
+
+.quantity-control label[for="qty-home"] {
+  font-size: clamp(0.8rem, 2.2vw, 0.9rem);
+}
+
+.qty-display {
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
+  font-weight: 500;
+  min-width: clamp(30px, 8vw, 40px);
+  text-align: center;
+  padding: clamp(4px, 1vw, 5px) clamp(8px, 2vw, 10px);
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+}
+
+.qty-btn {
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(0.9rem, 2.5vw, 1rem);
+  font-weight: 500;
+  width: clamp(30px, 8vw, 40px);
+  height: clamp(30px, 8vw, 40px);
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.qty-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.qty-btn:active {
+  background-color: #d0d0d0;
+}
+
+.qty-btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.add-to-cart-btn {
+  background: var(--secondary);
+  color: white;
+  border: none;
+  padding: clamp(5px, 1vw, 6px) clamp(10px, 2vw, 12px);
+  border-radius: clamp(4px, 1vw, 6px);
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  width: 100%;
+  max-width: clamp(100px, 20vw, 120px);
+  text-align: center;
+}
+
+.add-to-cart-btn:hover {
+  background: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}

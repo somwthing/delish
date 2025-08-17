@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Delish Gourmet Menu</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="/css/index.css" />
+  <link rel="stylesheet" href="/css/menu.css" />
+  <link rel="stylesheet" href="/css/responsive.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">Delish</div>
+      <p class="subtitle">
+        Savor the finest gourmet experience with our chef-curated lunch menu
+      </p>
+    </header>
+
+    <div class="squares-container">
+      <div class="square home-square selected" data-section="home">home</div>
+      <div class="square promo-square" data-section="promo">promo</div>
+      <div class="square wrapper-square" data-section="wrapper">wrapper</div>
+      <div class="square box-square" data-section="box">box</div>
+      <div class="square special-square" data-section="special">special</div>
+    </div>
+
+    <div class="menu-item-wrapper hidden">
+      <div class="tab" data-tab="value-pack">Value Pack</div>
+      <div class="tab active" data-tab="yummy">Yummy</div>
+      <div class="tab" data-tab="special">Special</div>
+    </div>
+
+    <div class="user-order-list" id="user-order-list" aria-expanded="false">
+      <div id="order-list-no">Items: 0</div>
+      <div id="order-list-cost">Total: Rp0.00</div>
+      <div id="order-process"><button>Buy</button></div>
+      <div id="double-arrow">⯆</div>
+      <div id="cart-items"></div>
+    </div>
+
+    <section class="menu-container">
+      <!-- Dynamically populated by menu.js -->
+    </section>
+
+    <div id="total-bill">Total: Rp0.00</div>
+    <button id="order-btn">Place Order <i class="fas fa-arrow-right"></i></button>
+  </div>
+
+  <div id="image-popup" class="image-popup hidden">
+    <span class="close-popup">&times;</span>
+    <img class="popup-content" id="popup-image" alt="Selected Food Item" />
+  </div>
+
+  <script type="module" src="/js/menu.js"></script>
+  <script type="module" src="/js/cart.js"></script>
+  <script type="module" src="/js/order.js"></script>
+  <script type="module" src="/js/modal.js"></script>
+  <script type="module" src="/js/index.js"></script>
+</body>
+</html>

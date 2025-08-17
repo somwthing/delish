@@ -1,0 +1,9 @@
+[
+  {
+    "id": "value-pack",
+    "name": "Salmon Salad",
+    "price": 7.00,
+    "image": "images/salmon-salad.jpg",
+    "description": "Fresh salmon with crisp veggies."
+  }
+]
