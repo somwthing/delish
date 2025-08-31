@@ -141,7 +141,7 @@ app.use((err, req, res, next) => {
 async function startServer() {
   await initializeDataFiles();
   
-  app.listen(port, () => {
+  app.listen(port, "0.0.0.0", () => {
     console.log(`[SERVER] Running on http://localhost:${port}`);
     console.log(`[SERVER] Data directory: ${DATA_DIR}`);
     console.log(`[SERVER] Debug endpoints:
@@ -156,4 +156,5 @@ startServer().catch(err => {
 });
 
 // Export for testing
+
 module.exports = app;
