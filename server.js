@@ -1,21 +1,28 @@
-// File: server.js
-// Purpose: Main Express server for the Delish app.
-// - Binds to 0.0.0.0 so container networking works correctly
-// - Ensures data dir & cart.json exist on startup
-// - Provides debug endpoints and robust error/exit handling
-// - Exports `app` for testing
+/**
+ * File: server.js
+ * Path: / (project root)
+ * Purpose: Main Express server for the Delish app.
+ * - Binds to process.env.PORT (fallback 3000) and 0.0.0.0 for container networking.
+ * - Ensures data directory and cart.json exist on startup.
+ * - Provides debug endpoints and robust error/exit handling.
+ * - Exports `app` for testing.
+ *
+ * Requirements satisfied:
+ * - Robust error handling (try/catch, top-level handlers)
+ * - Detailed logging (startup, routes, file operations)
+ * - Header comments and inline comments
+ */
 
 const express = require('express');
 const path = require('path');
 const fs = require('fs').promises;
 const cookieParser = require('cookie-parser');
-const { v4: uuidv4 } = require('uuid');
 
-// Middlewares (keep your existing implementations)
-const logger = require('./middlewares/logger');
-const { assignUserId } = require('./middlewares/userId');
+// local middlewares (must exist in ./middlewares/)
+const logger = require('./middlewares/logger'); // request logger
+const { assignUserId } = require('./middlewares/userId'); // sets cookie userId
 
-// Routes (keep your existing route files)
+// route modules (must exist in ./routes/)
 const menuRoutes = require('./routes/menu-routes');
 const orderRoutes = require('./routes/order-routes');
 const adminRoutes = require('./routes/admin-routes');
@@ -23,68 +30,65 @@ const dashboardRoutes = require('./routes/dashboard-routes');
 const cartRoutes = require('./routes/cart-routes');
 const vendorRoutes = require('./routes/vendor-routes');
 
-// Services (file read/write helpers)
+// service helpers (must exist in ./services/)
 const { readFile, writeFile } = require('./services/fileService');
 
 const app = express();
 
-// NOTE: `port` default uses process.env.PORT if provided by platform (Coolify)
+// Use platform-provided PORT whenever possible (Coolify will inject PORT)
 const port = process.env.PORT || 3000;
 const DATA_DIR = path.join(__dirname, 'data');
 const CART_FILE = 'cart.json';
 
 // ======================= Startup helpers =======================
 /**
- * Ensure data directory and cart.json exist.
- * - If cart.json is an array, convert it to an object (legacy handling).
- * - On fatal error, exit with non-zero code.
+ * initializeDataFiles()
+ * - ensures /data exists
+ * - ensures cart.json exists and is an object (migrate from array if needed)
  */
 async function initializeDataFiles() {
   try {
     await fs.mkdir(DATA_DIR, { recursive: true });
-
     try {
+      // readFile (service) returns parsed JSON or throws
       const cart = await readFile(CART_FILE);
       if (Array.isArray(cart)) {
         console.warn('[STARTUP] Converting cart.json from array to object');
         await writeFile(CART_FILE, {});
       }
-    } catch (error) {
-      if (error && error.code === 'ENOENT') {
-        console.log('[STARTUP] Creating initial cart.json');
+      console.log('[STARTUP] cart.json exists and is valid');
+    } catch (err) {
+      if (err && err.code === 'ENOENT') {
+        console.log('[STARTUP] cart.json not found — creating a new file');
         await writeFile(CART_FILE, {});
       } else {
-        // If readFile threw a different error, surface it
-        throw error;
+        // rethrow other problems so outer try catches and exits
+        throw err;
       }
     }
-  } catch (error) {
-    console.error('[STARTUP] Initialization error:', error);
-    // If initialization fails, we should not continue running
+  } catch (err) {
+    console.error('[STARTUP] Initialization error:', err);
+    // Fatal startup error — exit so orchestrator knows container failed
     process.exit(1);
   }
 }
 
 // ======================= Middleware =======================
-app.use(logger); // request logging middleware (your implementation)
+app.use(logger); // Add your logger implementation (logs method, url, status)
 app.use(cookieParser());
-app.use(assignUserId); // sets/reads UUID cookie for users
+app.use(assignUserId); // ensures each user has a userId cookie
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve public assets
+// Serve static assets
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Serve static admin and vendor dashboard files (still served by Express)
+// Serve admin and vendor dashboards statically
 app.use('/admin', express.static(path.join(__dirname, 'admin')));
 app.use('/vendor', express.static(path.join(__dirname, 'vendor')));
 
 // ======================= Debug Endpoints =======================
-/**
- * GET /debug/cart-state
- * Returns metadata and content for cart.json (useful for debugging in container)
- */
 app.get('/debug/cart-state', async (req, res) => {
   try {
     const filePath = path.join(DATA_DIR, CART_FILE);
@@ -98,13 +102,13 @@ app.get('/debug/cart-state', async (req, res) => {
       lastModified: stats.mtime,
       content: content,
       parsed: safeJsonParse(content),
-      currentUser: req.cookies.userId
+      currentUser: req.cookies.userId || null
     });
   } catch (error) {
     res.json({
       exists: false,
-      error: error.message,
-      currentUser: req.cookies.userId
+      error: error && error.message ? error.message : String(error),
+      currentUser: req.cookies.userId || null
     });
   }
 });
@@ -122,6 +126,7 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// API & module routes
 app.use('/api/menu', menuRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/orders', orderRoutes);
@@ -129,12 +134,12 @@ app.use('/admin', adminRoutes);
 app.use('/admin', dashboardRoutes);
 app.use('/vendor', vendorRoutes);
 
-// Redirect convenience routes
+// Redirect convenience endpoints (if someone hits /admin or /vendor)
 app.get('/admin', (req, res) => res.redirect('/admin/dashboard.html'));
 app.get('/vendor', (req, res) => res.redirect('/vendor/vendor.html'));
 
 // ======================= Error handlers =======================
-// 404 handler (log then respond)
+// 404 handler
 app.use((req, res) => {
   console.warn(`[404] ${req.method} ${req.originalUrl}`);
   res.status(404).json({
@@ -144,26 +149,27 @@ app.use((req, res) => {
   });
 });
 
-// General error handler (logs stack; returns generic message in production)
+// Generic error handler
 app.use((err, req, res, next) => {
-  console.error(`[500] ${req.method} ${req.originalUrl}\n${err.stack}`);
+  console.error(`[500] ${req.method} ${req.originalUrl}\n${err && err.stack ? err.stack : err}`);
   res.status(500).json({
     message: 'Internal server error',
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    error: process.env.NODE_ENV === 'development' ? (err && err.message) : undefined
   });
 });
 
-// ======================= Server startup & shutdown =======================
+// ======================= Server startup & graceful shutdown =======================
 let serverInstance = null;
 
 async function startServer() {
   await initializeDataFiles();
 
-  const bindAddr = '0.0.0.0'; // bind to all interfaces so container accepts external connections
+  // Use process.env.PORT when available; bind to 0.0.0.0 for container networking
+  const actualPort = process.env.PORT || port;
+  const bindAddr = '0.0.0.0';
 
-  // Start server and keep instance so we can close gracefully
-  serverInstance = app.listen(port, bindAddr, () => {
-    console.log(`[SERVER] Running on http://${bindAddr}:${port}`);
+  serverInstance = app.listen(actualPort, bindAddr, () => {
+    console.log(`[SERVER] Running on http://${bindAddr}:${actualPort}`);
     console.log(`[SERVER] Data directory: ${DATA_DIR}`);
     console.log(`[SERVER] Debug endpoints:
   /debug/cart-state - View cart.json state
@@ -171,12 +177,11 @@ async function startServer() {
   });
 }
 
-// Graceful shutdown helpers
+// Graceful shutdown helper
 async function shutdown(signal) {
-  console.log(`[SERVER] Received ${signal} - shutting down gracefully...`);
+  console.log(`[SERVER] Received ${signal} — shutting down gracefully...`);
   try {
     if (serverInstance) {
-      // stop accepting new connections, wait up to 10s for existing
       serverInstance.close(err => {
         if (err) {
           console.error('[SERVER] Error closing server:', err);
@@ -186,9 +191,9 @@ async function shutdown(signal) {
         process.exit(0);
       });
 
-      // Force exit after timeout if server doesn't close
+      // Force exit if not closed in 10s
       setTimeout(() => {
-        console.warn('[SERVER] Forcing shutdown after timeout.');
+        console.warn('[SERVER] Force exit after timeout.');
         process.exit(1);
       }, 10000).unref();
     } else {
@@ -200,27 +205,26 @@ async function shutdown(signal) {
   }
 }
 
-// Top-level error handlers so container exits on unhandled errors (visible in logs)
+// Top-level error handlers — ensure container exits so orchestrator can restart
 process.on('uncaughtException', (err) => {
   console.error('[FATAL] uncaughtException:', err);
-  // give logs a moment then exit
   setTimeout(() => process.exit(1), 100);
 });
 
 process.on('unhandledRejection', (reason, p) => {
-  console.error('[FATAL] unhandledRejection at Promise', p, 'reason:', reason);
+  console.error('[FATAL] unhandledRejection at:', p, 'reason:', reason);
   setTimeout(() => process.exit(1), 100);
 });
 
-// Listen for termination signals from orchestrator (Coolify / Docker)
+// Handle termination signals
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('SIGINT', () => shutdown('SIGINT'));
 
-// Start the server
+// Start server
 startServer().catch(err => {
   console.error('[SERVER] Failed to start:', err);
   process.exit(1);
 });
 
-// Export app so tests or other modules can require it
+// Export app for tests and tools
 module.exports = app;
