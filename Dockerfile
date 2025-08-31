@@ -1,40 +1,29 @@
-# =========================
 # File: Dockerfile
-# Purpose: Build & run Node.js app with Nginx reverse proxy
-# =========================
-
-# Base image with Node.js
 FROM node:20-alpine
 
-# Set working directory
 WORKDIR /app
 
-# Copy dependency files
+# copy only package files first for caching
 COPY package.json package-lock.json ./
 
-# Install dependencies
 RUN npm install --production
 
-# Copy app source
+# copy the rest of the app
 COPY . .
 
-# Install Nginx for reverse proxy
-RUN apk add --no-cache nginx
-
-# Copy Nginx config
-COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
-
-# Ensure data directory exists for cart.json
+# ensure data dir
 RUN mkdir -p /app/data \
     && chown -R node:node /app/data \
     && chmod -R 775 /app/data
 
-# Expose HTTP
-EXPOSE 80
+# expose the port the app listens on
+EXPOSE 3000
 
-# Healthcheck: ensures app is alive
+# healthcheck uses wget (install it)
+RUN apk add --no-cache wget
+
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://127.0.0.1/ || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/ || exit 1
 
-# Run Node.js + Nginx together
-CMD ["sh", "-c", "node server.js & nginx -g 'daemon off;'"]
+# start node directly (don't run nginx here)
+CMD ["sh", "-c", "node server.js"]
