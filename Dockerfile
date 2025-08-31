@@ -1,17 +1,26 @@
-# Start from an Nginx base image
-FROM nginx:alpine
+# Use Node.js base image
+FROM node:20-alpine
 
 # Set working directory
-WORKDIR /var/www/html
+WORKDIR /app
 
-# Copy your application files into the container
+# Copy package.json and package-lock.json
+COPY package.json package-lock.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy all application files
 COPY . .
 
-# Copy your custom Nginx configuration
+# Install Nginx for reverse proxy
+RUN apk add --no-cache nginx
+
+# Copy custom Nginx configuration
 COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
 
-# Expose port 80
+# Expose port 80 (Nginx will listen here)
 EXPOSE 80
 
-# Start Nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Start Nginx and Node.js
+CMD ["sh", "-c", "node server.js & nginx -g 'daemon off;'"]
