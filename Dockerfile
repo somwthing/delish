@@ -21,6 +21,8 @@ COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Create data directory for cart.json
 RUN mkdir -p /app/data
+RUN chown -R node:node /app/data
+RUN chmod -R 775 /app/data
 
 # Expose port 80 (Nginx will listen here)
 EXPOSE 80
