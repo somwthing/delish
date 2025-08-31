@@ -35,3 +35,7 @@ EXPOSE 80
 # Start Node.js and Nginx
 # Run Node in background, then replace shell with Nginx
 CMD ["sh", "-c", "node server.js & exec nginx -g 'daemon off;'"]
+
+# Add to end of Dockerfile (before CMD)
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost/ || exit 1
